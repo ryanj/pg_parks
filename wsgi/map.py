@@ -19,9 +19,7 @@ def index():
     #return render_template('index.html',
     #    parks=Map.query.order_by(Map.pub_date.desc()).all()
     #)
-    return render_template('index.html',
-        parks=db.query("SELECT * FROM "+ table_name+";")
-    )
+    return render_template('index.html')
 
 #return all parks:
 @app.route("/parks")
@@ -40,9 +38,15 @@ def within():
     lon1 = float(request.args.get('lon1'))
     lat2 = float(request.args.get('lat2'))
     lon2 = float(request.args.get('lon2'))
+    print "lat1 = " + lat1
+    print "lon1 = " + lon1
+    print "lat2 = " + lat2
+    print "lon2 = " + lon2
 
     #use the request parameters in the query
-    result = db.query("SELECT * FROM "+table+name+" WHERE")
+    result = db.query("SELECT * FROM "+table_name+" t WHERE ST_Intersects( \
+        ST_MakeEnvelope("+lat1+", "+lon1+", "+lat2+", "+lon2+", 4326) \
+        t.the_geom)")
 
     #turn the results into valid JSON
     return str(json.dumps({'results' : list(result)},default=json_util.default))
